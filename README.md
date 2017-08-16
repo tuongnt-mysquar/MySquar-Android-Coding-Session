@@ -23,3 +23,5 @@ https://developers.themoviedb.org/3/movies/get-movie-details
  - RxJava
  - Dependency injection
  - Unit test
+
+https://www.themoviedb.org/talk/568e3711c3a36858fc002384

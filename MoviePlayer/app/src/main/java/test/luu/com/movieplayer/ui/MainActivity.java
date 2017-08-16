@@ -19,6 +19,7 @@ import test.luu.com.movieplayer.R;
 import test.luu.com.movieplayer.adapter.HomeAdapter;
 import test.luu.com.movieplayer.component.DaggerHomeComponent;
 import test.luu.com.movieplayer.model.Movie;
+import test.luu.com.movieplayer.model.MovieDetail;
 import test.luu.com.movieplayer.model.Movies;
 import test.luu.com.movieplayer.module.HomeModule;
 import test.luu.com.movieplayer.presenter.HomePresenter;
@@ -57,19 +58,11 @@ public class MainActivity extends BaseActivity implements HomeMVP.View{
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
                 mRefreshLayout.setRefreshing(true);
-                mPresenter.getNowPlaying();
+                mAdapter.resetData();
+                mPresenter.getNowPlaying2();
             }
         });
 
-        mNetworkBroadcast = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                mRefreshLayout.setRefreshing(true);
-                mPresenter.getNowPlaying();
-            }
-        };
-        registerReceiver(mNetworkBroadcast, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         createAdapter();
     }
 
@@ -83,11 +76,33 @@ public class MainActivity extends BaseActivity implements HomeMVP.View{
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(mNetworkBroadcast == null){
+
+            mNetworkBroadcast = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+
+                    mRefreshLayout.setRefreshing(true);
+                    mPresenter.getNowPlaying2();
+                }
+            };
+            registerReceiver(mNetworkBroadcast, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         if(mNetworkBroadcast != null){
 
-            unregisterReceiver(mNetworkBroadcast);
+            try {
+                unregisterReceiver(mNetworkBroadcast);
+            }catch (Exception e){
+                //
+            }
         }
     }
 
@@ -98,6 +113,9 @@ public class MainActivity extends BaseActivity implements HomeMVP.View{
             @Override
             public void onItemClick(Movie movie) {
                 //
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra(MovieDetail.KEY, movie.getId());
+                startActivity(intent);
             }
         });
         mRvHome.setAdapter(mAdapter);
@@ -114,6 +132,7 @@ public class MainActivity extends BaseActivity implements HomeMVP.View{
     @Override
     public void onGetNowPlayingFailure(String message) {
 
+        // should be in string resources
         Toast.makeText(this, "Cannot get now playing because of: " + message, Toast.LENGTH_LONG);
     }
 }

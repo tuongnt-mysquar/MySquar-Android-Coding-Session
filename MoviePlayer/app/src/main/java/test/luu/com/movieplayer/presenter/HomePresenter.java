@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observer;
 import test.luu.com.movieplayer.model.Movies;
 import test.luu.com.movieplayer.service.ApiService;
 import test.luu.com.movieplayer.service.HomeMVP;
@@ -42,6 +43,28 @@ public class HomePresenter implements HomeMVP.Presenter{
             public void onFailure(Call<Movies> call, Throwable t) {
 
                 mView.onGetNowPlayingFailure(t.getMessage());
+            }
+        });
+    }
+
+    public void getNowPlaying2(){
+
+        mApi.getNowPlaying2(null).subscribe(new Observer<Movies>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+                mView.onGetNowPlayingFailure(e.getMessage());
+            }
+
+            @Override
+            public void onNext(Movies movies) {
+
+                mView.onGetNowPlayingSuccess(movies);
             }
         });
     }

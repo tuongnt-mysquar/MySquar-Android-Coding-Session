@@ -19,12 +19,15 @@ import java.util.List;
 
 import test.luu.com.movieplayer.R;
 import test.luu.com.movieplayer.model.Movie;
+import test.luu.com.movieplayer.util.AnimateUtil;
 
 /**
  * Created by luu trinh on 8/16/2017.
  */
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemViewHolder> {
+
+
 
     class ItemViewHolder extends RecyclerView.ViewHolder{
 
@@ -48,6 +51,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemViewHolder
     List<Movie> mMovies;
     int mSize;
     Listener mListener;
+    int mLastPositionAnimated = -1;
 
     public HomeAdapter(Context context, List<Movie> movies){
 
@@ -58,6 +62,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemViewHolder
 
             mMovies = new ArrayList<>();
         }
+    }
+
+    public void resetData() {
+
+        mMovies = new ArrayList<>();
     }
 
     public void addItems(List<Movie> movies){
@@ -83,10 +92,26 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ItemViewHolder
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
 
-        Movie movie = mMovies.get(holder.getAdapterPosition());
-//        Glide.with(mContext).load()
+        final Movie movie = mMovies.get(holder.getAdapterPosition());
+        String posterPath = movie.getPosterPath();
+        Glide.with(mContext).load(Movie.BASE_IMAGE_URL + posterPath).override(mSize, mSize).centerCrop().into(holder.imgView.get());
         holder.txtTitle.get().setText(movie.getTitle());
         holder.txtSubtitle.get().setText(movie.getReleaseDate());
+        holder.cardView.get().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mListener != null){
+
+                    mListener.onItemClick(movie);
+                }
+            }
+        });
+
+        if(holder.getAdapterPosition() > mLastPositionAnimated) {
+            AnimateUtil.setCardViewFromLeftAnimation(mContext, holder.itemView);
+            mLastPositionAnimated = holder.getAdapterPosition();
+        }
     }
 
     @Override

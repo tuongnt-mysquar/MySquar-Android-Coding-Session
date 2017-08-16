@@ -10,6 +10,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Movie {
 
+    public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/w185";
+
     @SerializedName("vote_count")
     @Expose
     private Integer voteCount;
